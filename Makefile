@@ -8,4 +8,5 @@ $(target): $(objects)
 	$(cc) -o $(target) $(objects) $(flags)
 
 clean:
-	rm test $(objects)
+	rm -rf test $(objects) users/*
+	touch users/placeholder

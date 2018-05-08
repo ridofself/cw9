@@ -5,7 +5,7 @@
 struct user {	char name[USER_NAME_SIZE];	};
 
 struct user user_create(const char* name);
-
-void user_save(struct user);
+int user_save(struct user);
+struct user user_load(char* name);
 
 /* end of file */
