@@ -5,7 +5,7 @@
 #include <stdio.h> /* printf FILE rename remove */
 #include <ctype.h> /* isalnum */
 
-static struct user user_empty;
+static struct user user_empty; /* returned as a null value */
 static char* users_folder = "users/";
 
 struct user user_create(const char* name)
@@ -13,14 +13,15 @@ struct user user_create(const char* name)
 	int i;
 	struct user newUser;
 
-	for ( i=0; i<USER_NAME_SIZE; i++) 
-		{
-		newUser.name[i] = name[i]; /* copy name, char-by-char */
-		if (name[i] == '\0') break; /* finished copying */
-		if (!isalnum(name[i])) return user_empty; /* bad char */
-		}
+	if ( !name ) return user_empty; /* prevent segfault */
 
-	if (strcmp(name, newUser.name)) return user_empty; /* too long */
+	for ( i=0; name[i]!='\0'; i++ ) /* iterate over chars in name */
+		{
+		if ( i==USER_NAME_SIZE ) return user_empty; /* too long */
+		if (!isalnum(name[i])) return user_empty; /* bad char */
+		newUser.name[i] = name[i]; /* copy name to newUser.name */
+		}
+	newUser.name[i] = '\0'; /* null terminate the string */
 	return newUser;
 	}
 
@@ -33,7 +34,7 @@ int user_save(struct user user)
 	sprintf(filePath, "%s%s", users_folder, user.name);
 	sprintf(oldFilePath, "%s_%s", users_folder, user.name);
 
-	if ( (file = fopen(filePath, "r")) != NULL ) /* can file be read? */
+	if ( (file = fopen(filePath, "r")) != NULL ) /* file can be read */
 		{
 		fclose(file);
 		return -1; /* file already exists, don't overwrite */
@@ -41,7 +42,7 @@ int user_save(struct user user)
 
 	file = fopen(filePath, "wb"); /* file created */
 	fwrite(&user, sizeof (struct user), 1, file); /* user saved */
-	remove(oldFilePath); /* remove hidden backup copy */
+	remove(oldFilePath); /* remove hidden backup copy (if it exists) */
 	fclose(file);
 	return 0;
 	}
@@ -64,7 +65,7 @@ struct user user_load(char *name)
 		return user_empty; /* file does not exist */
 
 	fread(&user, sizeof (struct user), 1, file); /* extract user */
-	rename(filePath, newFilePath); /* hide file while in use */
+	rename(filePath, newFilePath); /* hide file while user in use */
 	fclose(file);
 	return user;
 	}

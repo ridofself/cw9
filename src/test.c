@@ -19,20 +19,24 @@ void test_user_create()
 	int i;
 	char* badName = "hasIllegalChar@";
 
-	char testName[USER_NAME_SIZE +1] = "testName";
+	char testName[USER_NAME_SIZE +2] = "testName";
 	struct user testUser = user_create(testName);
 	assert(!strcmp(testUser.name, testName));
 	test_count++; /* new user's name was stored */
 
-	for (i=0; i<USER_NAME_SIZE; i++) testName[i] = 'x';
+	for (i=0; i<=USER_NAME_SIZE; i++) testName[i] = 'x';
 	testName[i+1] = '\0'; /* make a too-long name, null terminated */
 	testUser = user_create(testName);
 	assert(strlen(testUser.name) == 0);
-	test_count++; /* empty user assigned; name is too long */
+	test_count++; /* empty user assigned */
 
 	testUser = user_create(badName);
 	assert(strlen(testUser.name) == 0);
 	test_count++; /* empty user assigned due to name w/ bad char */
+
+	testUser = user_create(NULL);
+	assert(strlen(testUser.name) == 0);
+	test_count++; /* NULL string not allowed */
 	}
 
 void test_user_save()
