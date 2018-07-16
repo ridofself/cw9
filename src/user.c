@@ -36,6 +36,11 @@ static struct user named(struct user user, const char* name)
 
 static struct user passworded(struct user user, const char* password)
 	{
+	if ( !password )
+		{
+		user.err = -5; /* password cannot be NULL */
+		return user; /* return early to prevent segfault */
+		}
 	int i;
 	for ( i=0; password[i]!='\0'; i++ ) /* iterate over each char */
 		{
@@ -67,12 +72,13 @@ int user_save(struct user user)
 	sprintf(filePath, "%s%s", users_folder, user.name);
 	sprintf(hiddenFile, "%s_%s", users_folder, user.name);
 
+	/* FIXME catches all! */
 	if ( (file = fopen(filePath, "r")) != NULL ) /* file can be read */
 		{
+		printf("file %s already exists\n", user.name);
 		fclose(file);
 		return -1; /* file already exists, don't overwrite */
 		}
-
 	file = fopen(filePath, "wb"); /* file created */
 	fwrite(&user, sizeof (struct user), 1, file); /* user saved */
 	remove(hiddenFile); /* remove hidden backup copy (if it exists) */
@@ -88,15 +94,19 @@ struct user user_load(char *name)
 	char hiddenFile[strlen(filePath) + 1]; /* _ prepended */
 	unsigned int i;
 
-	for ( i=0; name[i]!='\0'; i++ )
-		if ( i == USER_NAME_SIZE) return user_empty; /* too long */
+	user = named(user, name);
+	/* FIXME catches all! */
+	if ( user.err ) return user; /* fail if bad user name given */
 
 	sprintf(filePath, "%s%s", users_folder, name);
 	sprintf(hiddenFile, "%s_%s", users_folder, name);
 
 	if ( (file = fopen(filePath, "rb") ) == NULL )
-		return user_empty; /* file does not exist */
-
+		{
+		printf("failed to open %s\n", name);
+		user.err = -6; /* file does not exist */
+		return user;
+		}
 	fread(&user, sizeof (struct user), 1, file); /* extract user */
 	rename(filePath, hiddenFile); /* hide file while user in use */
 	fclose(file);

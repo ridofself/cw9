@@ -45,6 +45,10 @@ void test_user_create()
 	testUser = user_create(testName, testPassword);
 	assert(testUser.err == -4);
 	test_count++; /* long password caught */
+
+	testUser = user_create(testName, NULL);
+	assert(testUser.err == -5);
+	test_count++; /* NULL password caught */
 	}
 
 void test_user_save()
@@ -62,7 +66,15 @@ void test_user_load()
 	user_save(loadableUser);
 	loadedUser = user_load(loadableUser.name);
 	assert(!strcmp(loadedUser.name, loadableUser.name));
-	test_count++; /* loadable and loaded users are the same */
+	test_count++; /* successfully loaded user */
+
+	loadedUser = user_load("doesNotExist");
+	assert(loadedUser.err == -6);
+	test_count++; /* non-existant username caught */
+
+	loadedUser = user_load("B@dN@m3");
+	assert(loadedUser.err == -2);
+	test_count++; /* non-existant username caught */
 	}
 
 void test_all()
