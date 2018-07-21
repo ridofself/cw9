@@ -1,12 +1,17 @@
 
 cc = gcc
 flags = -Wfatal-errors -Wall -Werror -Wpedantic -Wextra -std=c89
-objects = src/test.o src/user.o
+sources = $(wildcard src/*.c)
+objects = $(sources:.c=.o)
+
 target = test
 
 $(target): $(objects)
-	$(cc) -o $(target) $(objects) $(flags)
+	$(cc) $(objects) -o $(target)
+
+%.o: %.c
+	$(cc) -c $(flags) $< -o $@
 
 clean:
-	rm -rf test $(objects) users/*
+	rm -rf $(target) $(objects) users/*
 	touch users/placeholder

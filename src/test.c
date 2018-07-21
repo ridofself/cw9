@@ -51,38 +51,10 @@ void test_user_create()
 	test_count++; /* NULL password caught */
 	}
 
-void test_user_save()
-	{
-	struct user savedUser = user_create("testSave", "");
-	user_save(savedUser);
-	assert(user_save(savedUser) == -1);
-	test_count++; /* file not re-written */
-	}
-
-void test_user_load()
-	{
-	struct user loadableUser = user_create("loadme", "");
-	struct user loadedUser;
-	user_save(loadableUser);
-	loadedUser = user_load(loadableUser.name);
-	assert(!strcmp(loadedUser.name, loadableUser.name));
-	test_count++; /* successfully loaded user */
-
-	loadedUser = user_load("doesNotExist");
-	assert(loadedUser.err == -6);
-	test_count++; /* non-existant username caught */
-
-	loadedUser = user_load("B@dN@m3");
-	assert(loadedUser.err == -2);
-	test_count++; /* non-existant username caught */
-	}
-
 void test_all()
 	{
 	test_test();
 	test_user_create();
-	test_user_save();
-	test_user_load();
 	}
 
 int main()
@@ -90,6 +62,7 @@ int main()
 	printf("Testing...\n");
 	test_all();
 	printf("\t%d tests passed.\n", test_count);
+	return 0;
 	}
 
 /* end of file */

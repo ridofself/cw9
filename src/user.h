@@ -14,7 +14,6 @@ struct user
 		-3: name is NULL
 		-4: password provided is too long
 		-5: password is NULL
-		-6: no such file name
 		*********************************/
 	};
 
