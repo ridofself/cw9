@@ -7,7 +7,7 @@
 
 static struct user named(struct user user, const char* name)
 	{
-	int i;
+	unsigned int i;
 	if ( !name )
 		{
 		user.err = -3; /* name cannot be NULL */
@@ -20,7 +20,7 @@ static struct user named(struct user user, const char* name)
 			user.err = -1; /* name is too long */
 			break;
 			}
-		if ( !isalnum(name[i]) )
+		if ( !isalnum((unsigned char)name[i]) )
 			{
 			user.err = -2; /* bad char found */
 			break;
@@ -55,6 +55,7 @@ static struct user passworded(struct user user, const char* password)
 struct user user_create(const char* name, const char* password)
 	{
 	struct user user;
+	user.err = 0;
 	user = named(user, name);
 	user = passworded(user, password);
 	return user;
