@@ -12,4 +12,4 @@ user.o: user.c
 	$(cc) -c user.c $(flags)
 
 clean:
-	rm test *.o test.core
+	rm test *.o
